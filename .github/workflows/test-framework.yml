@@ -36,10 +36,10 @@ jobs:
       - name: Set up Android Emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 30
+          api-level: 35
           target: google_apis
           arch: x86_64
-          profile: Pixel_3
+          profile: Pixel 3a
           emulator-options: "-no-boot-anim -gpu swiftshader"
           script: echo "y" | $ANDROID_HOME/tools/bin/sdkmanager --licenses
           cores: 2
