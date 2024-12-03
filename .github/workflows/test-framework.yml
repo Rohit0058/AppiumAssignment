@@ -10,54 +10,41 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
-      # Step 1: Check out the repository code
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Step 2: Set up Java (for Maven and Tests)
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          distribution: 'temurin' # Use OpenJDK
-          java-version: '11'      # Specify your Java version
+          distribution: 'temurin'
+          java-version: '11'
 
-      # Step 3: Set up Node.js (for Appium)
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'      # Use the latest stable version of Node.js
+          node-version: '16'
 
-      # Step 4: Install Appium
       - name: Install Appium
         run: |
           npm install -g appium
           npm install -g appium-doctor
-          appium-doctor --android # Check if all Android dependencies are met
+          appium-doctor --android
 
-      # Step 5: Set up Android Emulator
       - name: Set up Android Emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 30                   # API level for the emulator
-          target: google_apis             # Target system image
-          arch: x86_64                    # Architecture
-          profile: Nexus_5X               # Device profile
+          api-level: 30
+          target: google_apis_arm64
+          arch: arm64-v8a
+          profile: Nexus_5X
           script: echo "y" | $ANDROID_HOME/tools/bin/sdkmanager --licenses
 
-      # Step 6: Start Emulator
-      - name: Start Emulator
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 30
-          target: google_apis
-          arch: x86_64
-          profile: Nexus_5X
-          emulator-options: "-no-boot-anim -no-snapshot-load"
+      - name: Wait for Emulator
+        run: adb wait-for-device && adb shell input keyevent 82
 
-      # Step 7: Cache Maven Dependencies
       - name: Cache Maven Dependencies
         uses: actions/cache@v2
         with:
@@ -66,16 +53,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven
 
-      # Step 8: Install Maven Dependencies
       - name: Install Maven Dependencies
         run: mvn clean install
 
-      # Step 9: Start Appium Server
       - name: Start Appium Server
         run: |
-          appium --log-level info --address 127.0.0.1 --port 4723 &
+          appium --log-level debug --address 127.0.0.1 --port 4723 &
         shell: bash
 
-      # Step 10: Run Tests
       - name: Run Tests
         run: mvn test -Dplatform=android
