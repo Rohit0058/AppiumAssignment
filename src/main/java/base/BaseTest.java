@@ -7,13 +7,16 @@ import io.appium.java_client.ios.IOSDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.ConfigReader;
+import utils.LoggerUtils;
+import utils.WaitUtils;
 
 import java.net.URL;
 import java.time.Duration;
 
 public class BaseTest {
-    protected static final Logger logger = LoggerFactory.getLogger(BaseTest.class);
+    protected Logger logger = LoggerUtils.getLogger(this.getClass());
     protected AppiumDriver driver;
+    protected WaitUtils waitUtils;
 
     public void setup(String platform) throws Exception {
         logger.info("Setting up the Appium driver and test environment");
@@ -24,7 +27,7 @@ public class BaseTest {
         } else {
             throw new IllegalArgumentException("Unsupported platform: " + platform);
         }
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(Integer.parseInt(ConfigReader.get("timeout"))));
+        waitUtils = new WaitUtils(driver);
     }
 
     private UiAutomator2Options getAndroidCapabilities() {

@@ -14,7 +14,7 @@ public class HomeTests extends BaseTest {
     @BeforeMethod
     public void setupTest() throws Exception {
         setup(ConfigReader.get("platform"));
-        homePage = new HomePage(driver);
+        homePage = new HomePage(driver, waitUtils, logger);
     }
 
     @Test

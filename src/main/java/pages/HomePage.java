@@ -1,21 +1,22 @@
 package pages;
 
-import base.BaseTest;
 import io.appium.java_client.AppiumDriver;
 import locators.HomePageLocators;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import utils.PollingWait;
+import org.slf4j.Logger;
+import utils.WaitUtils;
 
-import java.time.Duration;
 import java.util.List;
 
-public class HomePage extends BaseTest {
+public class HomePage {
     AppiumDriver driver;
-    PollingWait pollingWait = new PollingWait(driver);
+    private final WaitUtils waitUtils;
+    private final Logger logger;
 
-    public HomePage(AppiumDriver driver) {
+    public HomePage(AppiumDriver driver, WaitUtils waitUtils, Logger logger) {
         this.driver = driver;
+        this.waitUtils = waitUtils;
+        this.logger = logger;
     }
 
     // Verify if home screen text is displayed
@@ -35,14 +36,15 @@ public class HomePage extends BaseTest {
 
     // Verify navigation for each bottom menu item
     public boolean isMenuNavigationCorrect() throws InterruptedException {
-        pollingWait.waitForElementWithPolling(HomePageLocators.bottomMenuItems, 5, 500);
+        waitUtils.waitForVisibility(HomePageLocators.bottomMenuItems, 5, 500).isDisplayed();
         List<WebElement> menuItems = driver.findElements(HomePageLocators.bottomMenuItems);
         List<WebElement> menuItemsText = driver.findElements(HomePageLocators.bottomMenuItemsText);
 
         for (int i = 0; i < menuItemsText.size(); i++) {
             String text = menuItemsText.get(i).getText();
             menuItems.get(i).click();
-            pollingWait.waitForElementWithPolling(HomePageLocators.dynamicMenuItem(text), 51234, 500);
+            waitUtils.waitForVisibility(HomePageLocators.dynamicMenuItem(text), 5, 500).isDisplayed();
+
             logger.info("Clicked Menu Item - " + i + " " + text);
             WebElement value = driver.findElement(HomePageLocators.dynamicMenuItem(text));
             if (!value.isDisplayed()) {
