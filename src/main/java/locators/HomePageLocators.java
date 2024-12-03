@@ -3,12 +3,12 @@ package locators;
 import org.openqa.selenium.By;
 
 public class HomePageLocators {
-    public static final By HOME_SCREEN_TEXT = By.xpath("//*[contains(text(),'Demo app for the appium-boilerplate')]");
-    public static final By ANDROID_LOGO = By.id("androidLogo");
-    public static final By MENU_ITEMS = By.id("menuItem");
-
     public static By dynamicMenuItem(String menuName) {
         return By.xpath("//android.widget.TextView[@text='" + menuName + "']");
     }
+    public static final By homeScreenText = By.xpath("//android.widget.TextView[@text=\"Products\"]\n");
+    public static final By androidLogo = By.xpath("//android.view.ViewGroup[@content-desc=\"longpress reset app\"]/android.widget.ImageView");
+    public static final By bottomMenuItems = By.xpath("(//android.view.ViewGroup[@content-desc=\"store item\"])");
+    public static final By bottomMenuItemsText = By.xpath("(//android.widget.TextView[@content-desc=\"store item text\"])");
 }
 

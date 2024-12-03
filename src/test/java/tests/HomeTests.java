@@ -23,6 +23,16 @@ public class HomeTests extends BaseTest {
         Assert.assertTrue(homePage.isAndroidLogoDisplayed(), "Android logo is not displayed!");
     }
 
+    @Test
+    public void verifyMenuItems() {
+        Assert.assertEquals(homePage.getMenuItemCount(), 6, "Incorrect number of bottom menu items!");
+    }
+
+    @Test
+    public void verifyBottomMenuNavigation() throws InterruptedException {
+        Assert.assertTrue(homePage.isMenuNavigationCorrect(), "Menu navigation did not work as expected!");
+    }
+
     @AfterMethod
     public void tearDownTest() {
         tearDown();
