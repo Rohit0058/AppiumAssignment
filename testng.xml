@@ -1,8 +1,9 @@
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
-<suite name="ParallelExecutionSuite" parallel="methods" thread-count="4">
+<suite name="ParallelExecutionSuite">
     <test name="Mobile Tests">
         <classes>
             <class name="tests.HomeTests" />
+            <class name="tests.FormTests" />
         </classes>
     </test>
 </suite>
