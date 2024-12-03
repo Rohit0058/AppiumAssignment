@@ -2,8 +2,13 @@ package pages;
 
 import io.appium.java_client.AppiumDriver;
 import locators.HomePageLocators;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import utils.WaitUtils;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class HomePage {
     AppiumDriver driver;
@@ -41,44 +46,54 @@ public class HomePage {
         driver.findElement(HomePageLocators.formButton).click();
     }
 
-    // Verify navigation for each bottom menu item
-    public boolean isMenuNavigationCorrect() throws InterruptedException {
-        waitUtils.waitForVisibility(HomePageLocators.bottomMenuItems, 5, 500).isDisplayed();
-//        List<WebElement> menuItems = driver.findElements(HomePageLocators.bottomMenuItems);
-        waitUtils.waitForVisibility(HomePageLocators.dragButton, 5, 500).isDisplayed();
-        waitUtils.waitForVisibility(HomePageLocators.webViewButton, 5, 500).isDisplayed();
-        waitUtils.waitForVisibility(HomePageLocators.loginButton, 5, 500).isDisplayed();
-        waitUtils.waitForVisibility(HomePageLocators.formButton, 5, 500).isDisplayed();
-        waitUtils.waitForVisibility(HomePageLocators.swipeButton, 5, 500).isDisplayed();
-        waitUtils.waitForVisibility(HomePageLocators.homeButton, 5, 500).isDisplayed();
+    public boolean isMenuNavigationCorrect() {
+        List<By> bottomMenuLocators = Arrays.asList(
+                HomePageLocators.webViewButton,
+                HomePageLocators.loginButton,
+                HomePageLocators.formButton,
+                HomePageLocators.swipeButton,
+                HomePageLocators.dragButton
+        );
 
-//        List<WebElement> bottomMenuItems = new ArrayList<>();
-//        List<By> bottomMenuLocators = new ArrayList<>();
-//        bottomMenuLocators.add(HomePageLocators.homeButton);
-//        bottomMenuItems.addAll(driver.findElements(HomePageLocators.homeButton));
-//        bottomMenuItems.addAll(driver.findElements(HomePageLocators.webViewButton));
-//        bottomMenuItems.addAll(driver.findElements(HomePageLocators.loginButton));
-//        bottomMenuItems.addAll(driver.findElements(HomePageLocators.formButton));
-//        bottomMenuItems.addAll(driver.findElements(HomePageLocators.swipeButton));
-//        bottomMenuItems.addAll(driver.findElements(HomePageLocators.dragButton));
-//
-//        logger.info("Items Size - " + bottomMenuItems.size());
-//
-//        for (int i = 0; i < bottomMenuItems.size(); i++) {
-////            String text = bottomMenuItems.get(i).getText();
-//            bottomMenuItems.get(i).click();
-////            waitUtils.waitForVisibility(HomePageLocators.dynamicMenuItem(text), 5, 500).isDisplayed();
-//
-////            logger.info("Clicked Menu Item - " + i + " " + text);
-////            WebElement value = driver.findElement(HomePageLocators.dynamicMenuItem(text));
-////            if (!value.isDisplayed()) {
-////                return false;
-////            }
-////            logger.info("Verified Item Details Matched - " + i + " " + text);
-//            driver.navigate().back();
-//            logger.info("Back To Home - " + i + "\n");
-//        }
+        for (By menuLocator : bottomMenuLocators) {
+            // Wait for the menu item to be visible and click it
+            WebElement menuItem = waitUtils.waitForVisibility(menuLocator, 5, 500);
+            if (!menuItem.isDisplayed()) {
+                logger.error("Menu item not displayed: " + menuLocator);
+                return false;
+            }
+            menuItem.click();
+            logger.info("Clicked menu item: " + menuLocator);
 
+            // Validate the expected screen is displayed
+            By expectedScreenLocator = getExpectedScreenLocator(menuLocator);
+            WebElement expectedScreenElement = waitUtils.waitForVisibility(expectedScreenLocator, 5, 500);
+            if (!expectedScreenElement.isDisplayed()) {
+                logger.error("Expected screen not displayed after clicking: " + menuLocator);
+                return false;
+            }
+            logger.info("Verified navigation to screen: " + expectedScreenLocator);
+
+            // Navigate back to the home screen
+            driver.navigate().back();
+            logger.info("Navigated back to the home screen");
+        }
         return true;
     }
+
+    private By getExpectedScreenLocator(By menuLocator) {
+        if (menuLocator.equals(HomePageLocators.webViewButton)) {
+            return HomePageLocators.webViewScreen;
+        } else if (menuLocator.equals(HomePageLocators.loginButton)) {
+            return HomePageLocators.loginScreen;
+        } else if (menuLocator.equals(HomePageLocators.formButton)) {
+            return HomePageLocators.formScreen;
+        } else if (menuLocator.equals(HomePageLocators.swipeButton)) {
+            return HomePageLocators.swipeScreen;
+        } else if (menuLocator.equals(HomePageLocators.dragButton)) {
+            return HomePageLocators.dragScreen;
+        }
+        throw new IllegalArgumentException("Unknown menu locator: " + menuLocator);
+    }
+
 }

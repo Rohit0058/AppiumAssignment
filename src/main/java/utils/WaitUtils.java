@@ -2,10 +2,12 @@ package utils;
 
 import io.appium.java_client.AppiumDriver;
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.support.ui.FluentWait;
-
 import java.time.Duration;
+import java.util.NoSuchElementException;
 import java.util.function.Function;
 
 public class WaitUtils {
@@ -20,15 +22,17 @@ public class WaitUtils {
         FluentWait<AppiumDriver> wait = new FluentWait<>(driver)
                 .withTimeout(Duration.ofSeconds(timeoutInSeconds))
                 .pollingEvery(Duration.ofMillis(pollingIntervalMs))
-                .ignoring(Exception.class); // Ignore exceptions during polling
+                .ignoring(NoSuchElementException.class) // Ignore element not found
+                .ignoring(StaleElementReferenceException.class); // Handle stale elements during polling
 
-        return wait.until(d -> {
-            WebElement element = driver.findElement(locator);
-            if (condition.apply(element)) {
-                return element;
-            }
-            return null;
-        });
+        try {
+            return wait.until(driver -> {
+                WebElement element = driver.findElement(locator);
+                return condition.apply(element) ? element : null;
+            });
+        } catch (TimeoutException e) {
+            throw new TimeoutException("Condition not met for element located by: " + locator + " within " + timeoutInSeconds + " seconds.", e);
+        }
     }
 
     public WebElement waitForVisibility(By locator, int timeoutInSeconds, int pollingIntervalMs) {
@@ -36,6 +40,6 @@ public class WaitUtils {
     }
 
     public WebElement waitForClickability(By locator, int timeoutInSeconds, int pollingIntervalMs) {
-        return waitForCondition(locator, timeoutInSeconds, pollingIntervalMs, WebElement::isEnabled);
+        return waitForCondition(locator, timeoutInSeconds, pollingIntervalMs, element -> element.isDisplayed() && element.isEnabled());
     }
 }
