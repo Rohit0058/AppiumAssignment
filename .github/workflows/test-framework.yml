@@ -27,16 +27,23 @@ jobs:
         with:
           node-version: '16'
 
-      - name: Install Appium
+      - name: Install Android SDK Command-Line Tools
         run: |
-          npm install -g appium
-          npm install -g appium-doctor
-          appium-doctor --android
+          mkdir -p "$ANDROID_HOME/cmdline-tools"
+          curl -o sdk-tools.zip https://dl.google.com/android/repository/commandlinetools-mac-8512546_latest.zip
+          unzip sdk-tools.zip -d "$ANDROID_HOME/cmdline-tools"
+          mv "$ANDROID_HOME/cmdline-tools/cmdline-tools" "$ANDROID_HOME/cmdline-tools/latest"
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses
+        env:
+          ANDROID_HOME: $HOME/Library/Android/sdk
+          PATH: $PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
 
       - name: Install Required System Image
         run: |
           sdkmanager --install "system-images;android-35;google_apis_playstore;x86_64"
-          echo "y" | sdkmanager --licenses
+        env:
+          ANDROID_HOME: $HOME/Library/Android/sdk
+          PATH: $PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
 
       - name: Launch Emulator
         uses: reactivecircus/android-emulator-runner@v2
