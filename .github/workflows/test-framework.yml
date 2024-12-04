@@ -50,6 +50,9 @@ jobs:
           disable-linux-hw-accel: auto
           enable-hw-keyboard: true
           channel: stable
+          script: |
+            adb shell input keyevent 82 # Unlock the screen
+            adb devices # Verify the emulator is running
         
       - name: Wait for Emulator
         run: adb wait-for-device && adb shell input keyevent 82
