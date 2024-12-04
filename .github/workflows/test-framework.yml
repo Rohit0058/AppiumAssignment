@@ -33,26 +33,24 @@ jobs:
           npm install -g appium-doctor
           appium-doctor --android
 
-      - name: Set up Android Emulator
+      - name: Launch Emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 35
-          target: google_apis
+          target: google_apis_playstore
           arch: x86_64
-          profile: Pixel 3a
-          emulator-options: "-no-boot-anim -gpu swiftshader"
-          script: echo "y" | $ANDROID_HOME/tools/bin/sdkmanager --licenses
+          profile: pixel_3a
+          emulator-options: -no-boot-anim -gpu swiftshader
           cores: 2
           avd-name: test
           force-avd-creation: true
           emulator-boot-timeout: 600
           emulator-port: 5554
           disable-animations: true
-          disable-spellchecker: false
           disable-linux-hw-accel: auto
-          enable-hw-keyboard: false
+          enable-hw-keyboard: true
           channel: stable
-          
+        
       - name: Wait for Emulator
         run: adb wait-for-device && adb shell input keyevent 82
 
