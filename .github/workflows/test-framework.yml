@@ -83,7 +83,7 @@ jobs:
         cwd=$(pwd)
         pushd "$cwd"
         cd ~
-        appium driver install --source=local "$cwd"
+        appium driver install --source=local "$cwd" || { echo "Appium driver install failed"; exit 1; }
         appium driver doctor uiautomator2
         nohup appium server \
           --port=$APPIUM_TEST_SERVER_PORT \
