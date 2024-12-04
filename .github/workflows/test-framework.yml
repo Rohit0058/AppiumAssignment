@@ -33,6 +33,11 @@ jobs:
           npm install -g appium-doctor
           appium-doctor --android
 
+      - name: Install Required System Image
+        run: |
+          sdkmanager --install "system-images;android-35;google_apis_playstore;x86_64"
+          echo "y" | sdkmanager --licenses
+
       - name: Launch Emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -40,20 +45,20 @@ jobs:
           target: google_apis_playstore
           arch: x86_64
           profile: pixel_3a
-          emulator-options: -no-boot-anim -gpu swiftshader
+          emulator-options: -no-boot-anim -gpu swiftshader -verbose
           cores: 2
           avd-name: test
           force-avd-creation: true
-          emulator-boot-timeout: 600
+          emulator-boot-timeout: 1200
           emulator-port: 5554
           disable-animations: true
-          disable-linux-hw-accel: auto
+          disable-linux-hw-accel: true
           enable-hw-keyboard: true
           channel: stable
           script: |
-            adb shell input keyevent 82 # Unlock the screen
-            adb devices # Verify the emulator is running
-        
+            adb devices # List connected devices
+            adb shell input keyevent 82 # Unlock the emulator screen
+
       - name: Wait for Emulator
         run: adb wait-for-device && adb shell input keyevent 82
 
